@@ -30,4 +30,4 @@ Thanks to the following projects, teams, and individuals for being great resourc
 - [PKHeX](https://github.com/kwsch/PKHeX/) et al. for the database, documentation, examples, and code
 - [AnalogMan151](https://github.com/AnalogMan151) for the ultraSuMoFramework foundation of the plugin
 - [dragongyre173](https://github.com/dragonfyre173) for the data viewer overlay in-game
-- [JourneyOver](https://github.com/JourneyOver/CTRPF-AR-CHEAT-CODES) et al. for providing an extensive ActionReplay code database
+- [JourneyOver](https://github.com/JourneyOver/CTRPF-AR-CHEAT-CODES) et al. for providing an extensive ActionReplay code [database](https://github.com/JourneyOver/CTRPF-AR-CHEAT-CODES)
