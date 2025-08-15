@@ -1,6 +1,6 @@
 # Alolan CTRPluginFramework
 
-Alolan CTRPluginFramework is a 3gx plugin for Pokemon Sun, Moon, Ultra Sun, and Ultra Moon on the Nintendo 3DS console. This plugin is more so a continuation of ultraSuMoFramework with PKHeX implementations using an updated `.3gx` file format.
+Alolan CTRPluginFramework is a 3gx plugin for Pokemon Sun, Moon, Ultra Sun, and Ultra Moon on the Nintendo 3DS console. This plugin is more so a continuation of ultraSuMoFramework with PKHeX implementations using an updated `.3gx` file format. This project is also adopted from the previously abandoned [project](https://github.com/semaj14/Multi-PokemonFramework) due to lost accesses.
 
 ![Top](https://github.com/biometrix76/AlolanCTRPluginFramework/blob/main/Top.bmp)
 ![Bottom](https://github.com/biometrix76/AlolanCTRPluginFramework/blob/main/Bottom.bmp)
