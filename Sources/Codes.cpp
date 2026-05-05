@@ -1,4 +1,5 @@
 #include <optional>
+#include "Parser.hpp"
 #include "Codes.hpp"
 #include "PKHeX.hpp"
 
@@ -9,7 +10,7 @@ namespace CTRPluginFramework {
         // Prompt the user to enter a value then write it to memory if successful.
         if (KeyboardHandler<u16>::Set(entry->Name() + ":", true, false, 3, value, 0, 1, 999, Callback<u16>)) {
             Process::Write16(AutoGameSet(0x33124D8A, 0x3306119A), value);
-            OSD::Notify("Current Rank: " + to_string(value));
+            MessageBox(CenterAlign(entry->Name() + ": " + to_string(value)), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
@@ -19,7 +20,7 @@ namespace CTRPluginFramework {
         // Prompt the user to enter a value then write it to memory if successful.
         if (KeyboardHandler<u32>::Set(entry->Name() + ":", true, false, 7, value, 0, 0, 9999999, Callback<u32>)) {
             Process::Write32(AutoGameSet(0x33124D5C, 0x3306116C), value);
-            OSD::Notify("FC Collected: " + to_string(value));
+            MessageBox(CenterAlign(entry->Name() + ": " + to_string(value)), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
@@ -29,7 +30,7 @@ namespace CTRPluginFramework {
         // Prompt the user to enter a value then write it to memory if successful.
         if (KeyboardHandler<u32>::Set(entry->Name() + ":", true, false, 7, value, 0, 0, 9999999, Callback<u32>)) {
             Process::Write32(AutoGameSet(0x33124D58, 0x33061168), value);
-            OSD::Notify("Current FC: " + to_string(value));
+            MessageBox(CenterAlign(entry->Name() + ": " + to_string(value)), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
@@ -39,7 +40,7 @@ namespace CTRPluginFramework {
         // Prompt the user to enter a value then write it to memory if successful.
         if (KeyboardHandler<u32>::Set(entry->Name() + ":", true, false, 7, value, 0, 0, 9999999, Callback<u32>)) {
             Process::Write32(AutoGameSet(0x3313D740, 0x33079B50), value);
-            OSD::Notify("Guests Interacted With: " + to_string(value));
+            MessageBox(CenterAlign(entry->Name() + ": " + to_string(value)), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
@@ -49,7 +50,7 @@ namespace CTRPluginFramework {
         // Prompt the user to enter a value then write it to memory if successful.
         if (KeyboardHandler<u16>::Set(entry->Name() + ":", true, false, 4, value, 0, 1, 9999, Callback<u16>)) {
             Process::Write16(AutoGameSet(0x3313D802, 0x33079C12), value);
-            OSD::Notify("Facilities Hosted: " + to_string(value));
+            MessageBox(CenterAlign(entry->Name() + ": " + to_string(value)), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
@@ -59,7 +60,7 @@ namespace CTRPluginFramework {
         // Prompt the user to enter a value then write it to memory if successful.
         if (KeyboardHandler<u16>::Set(entry->Name() + ":", true, false, 4, value, 0, 0, 9999, Callback<u16>)) {
             Process::Write16(AutoGameSet(0x3313D800, 0x33079C10), value);
-            OSD::Notify("Missions Participated in: " + to_string(value));
+            MessageBox(CenterAlign(entry->Name() + ": " + to_string(value)), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
@@ -90,12 +91,12 @@ namespace CTRPluginFramework {
                 ++validPosition;
             }
 
-            else party[index] = "[Empty]";
+            else party[index] = getLanguage->Get("KB_BATTLE_EMPTY");
         };
 
         // Lambda function to handle empty positions
         auto setEmptySlot = [&](int index) {
-            party[index] = "[Empty]";
+            party[index] = getLanguage->Get("KB_BATTLE_EMPTY");
         };
 
         // Initialize validPosition counter
@@ -147,8 +148,8 @@ namespace CTRPluginFramework {
                 updatePointerOffsets(position); // Adjust pointer offsets based on selection
 
                 // Update the menu entry with the newly set position
-                entry->Name() = "Position: " << Color::Gray << Utils::ToString(position, 0);
-                OSD::Notify("Selected in-battle position: " + party[position - 1]);
+                entry->Name() = getLanguage->Get("KB_BATTLE_POSITION") + " " << Color::Gray << Utils::ToString(position, 0);
+                MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_SELECTED_POSITION") + " " + party[position - 1]), DialogType::DialogOk, ClearScreen::Both)();
             }
         }
     }
@@ -156,8 +157,15 @@ namespace CTRPluginFramework {
     static int statusFlag, selectedCondition;
 
     void StatusCondition(MenuEntry *entry) {
-        static const vector<pair<string, int>> statusConditions = {{"Paralyzed", 0x28}, {"Asleep", 0x30}, {"Frozen", 0x38}, {"Burned", 0x40}, {"Poisoned", 0x48}};
-        static const vector<string> statusChoice = {"None", "Affected"};
+        static const vector<pair<string, int>> statusConditions = {
+            {getLanguage->Get("KB_BATTLE_PARALYZED"), 0x28},
+            {getLanguage->Get("KB_BATTLE_ASLEEP"), 0x30},
+            {getLanguage->Get("KB_BATTLE_FROZEN"), 0x38},
+            {getLanguage->Get("KB_BATTLE_BURNED"), 0x40},
+            {getLanguage->Get("KB_BATTLE_POISONED"), 0x48}
+        };
+
+        static const vector<string> statusChoice = {getLanguage->Get("KB_BATTLE_NO_STATUS_EFFECTS"), getLanguage->Get("KB_BATTLE_AFFECTED")};
         vector<string> options;
         Keyboard keyboard;
 
@@ -176,7 +184,7 @@ namespace CTRPluginFramework {
                         for (const auto &condition : statusConditions)
                             Process::Write8(ptr, condition.second, 0);
 
-                    OSD::Notify("Status conditions removed");
+                    MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_STATUS_REMOVED")), DialogType::DialogOk, ClearScreen::Both)();
                 }
 
                 else if (statusFlag == 1) {
@@ -191,7 +199,7 @@ namespace CTRPluginFramework {
                             Process::Write8(ptr, statusConditions[selectedCondition].second, 1);
                         }
 
-                        OSD::Notify("Applied status condition: " + statusConditions[selectedCondition].first);
+                        MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_STATUS_APPLIED") + " " + statusConditions[selectedCondition].first), DialogType::DialogOk, ClearScreen::Both)();
                     }
                 }
             }
@@ -205,14 +213,21 @@ namespace CTRPluginFramework {
     static u8 statBoostVal[7];
 
     void Stats(MenuEntry *entry) {
-        static const vector<string> statOptions = {"Base", "Boosts"};
+        static const vector<string> statOptions = {getLanguage->Get("KB_BATTLE_STATS_BASE"), getLanguage->Get("KB_BATTLE_STATS_BOOST")};
         // Options for base stats
-        static const vector<string> mainStats = {"Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed"};
+        static const vector<string> mainStats = {
+            getLanguage->Get("KB_BATTLE_STAT_ATTACK"),
+            getLanguage->Get("KB_BATTLE_STAT_DEFENSE"),
+            getLanguage->Get("KB_BATTLE_STAT_SP_ATTACK"),
+            getLanguage->Get("KB_BATTLE_STAT_SP_DEFENSE"),
+            getLanguage->Get("KB_BATTLE_STAT_SPEED")
+        };
+
         // Options for boost stats: initialize with mainStats
         static const vector<string> statBoosts = []() {
             vector<string> combinedStats = mainStats;
-            combinedStats.push_back("Accuracy");
-            combinedStats.push_back("Evasiveness");
+            combinedStats.push_back(getLanguage->Get("KB_BATTLE_STAT_ACCURACY"));
+            combinedStats.push_back(getLanguage->Get("KB_BATTLE_STAT_EVASIVENESS"));
             return combinedStats;
         }();
 
@@ -232,8 +247,8 @@ namespace CTRPluginFramework {
                         // Get and validate base stat value
                         if (KeyboardHandler<u16>::Set(mainStats[mainStat] + ":", true, false, 3, value16, 0, 1, 999, Callback<u16>)) {
                             mainStatVal[mainStat] = value16; // Store base stat value
+                            MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_STAT_UPDATED") << " " << mainStats[mainStat] << ": " << to_string(value16)), DialogType::DialogOk, ClearScreen::Both)();
                             entry->SetGameFunc(UpdateStats);
-                            OSD::Notify("Updated " << mainStats[mainStat] << " to: " << to_string(value16));
                             break; // Exit loop after successful input
                         }
                     }
@@ -245,8 +260,8 @@ namespace CTRPluginFramework {
                         // Get and validate boost stat value
                         if (KeyboardHandler<u8>::Set(statBoosts[statBoost] + ":", true, false, 1, value8, 0, 0, 6, Callback<u8>)) {
                             statBoostVal[statBoost] = value8 + 6; // Adjust and store boost stat value
+                            MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_STAT_BOOSTED") << " " << statBoosts[statBoost] << ": x" << to_string(value8)), DialogType::DialogOk, ClearScreen::Both)();
                             entry->SetGameFunc(UpdateStats);
-                            OSD::Notify("Boosted " << statBoosts[statBoost] << " by: x" << to_string(value8));
                             break; // Exit loop after successful input
                         }
                     }
@@ -275,7 +290,7 @@ namespace CTRPluginFramework {
     static u8 mana;
 
     void HealthAndMana(MenuEntry *entry) {
-        static const vector<string> options = {"Health", "Mana"};
+        static const vector<string> options = {getLanguage->Get("KB_BATTLE_HEALTH"), getLanguage->Get("KB_BATTLE_MANA")};
         static int choice;
 
         // Get user inputs
@@ -290,20 +305,20 @@ namespace CTRPluginFramework {
             while (keyboard.Setup(entry->Name() + ":", true, options, choice) != -1) {
                 if (choice == 0) {
                     // Prompt the user for Health input and update the health variable if valid
-                    if (KeyboardHandler<u16>::Set("Health:", true, false, 3, tempHealth, 0, 1, 999, Callback<u16>)) {
+                    if (KeyboardHandler<u16>::Set(getLanguage->Get("KB_BATTLE_HEALTH") + ":", true, false, 3, tempHealth, 0, 1, 999, Callback<u16>)) {
                         health = tempHealth;
+                        MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_HEALTH_SET_TO") + " " << to_string(tempHealth)), DialogType::DialogOk, ClearScreen::Both)();
                         entry->SetGameFunc(UpdateHealthAndMana);
-                        OSD::Notify("Health set to: " << to_string(tempHealth));
                         break; // Exit the loop after
                     }
                 }
 
                 else if (choice == 1) {
                     // Prompt the user for Mana input and update the mana variable if valid
-                    if (KeyboardHandler<u8>::Set("Mana:", true, false, 2, tempMana, 0, 1, 99, Callback<u8>)) {
+                    if (KeyboardHandler<u8>::Set(getLanguage->Get("KB_BATTLE_MANA"), true, false, 2, tempMana, 0, 1, 99, Callback<u8>)) {
                         mana = tempMana;
+                        MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_MANA_SET_TO") + " " << to_string(tempMana)), DialogType::DialogOk, ClearScreen::Both)();
                         entry->SetGameFunc(UpdateHealthAndMana);
-                        OSD::Notify("PP set to: " << to_string(tempMana));
                         break; // Exit the loop after
                     }
                 }
@@ -351,7 +366,7 @@ namespace CTRPluginFramework {
             for (const auto &ptr : pointer)
                 Process::Write16(ptr, 0x12, heldItemName);
 
-            OSD::Notify("Item changed: " + string(heldItemList[heldItemName - 1]));
+            MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_ITEM_CHANGED") + " " + string(heldItemList[heldItemName - 1])), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
@@ -359,7 +374,13 @@ namespace CTRPluginFramework {
     static int moveSlot; // 4 slots available, variable used to determine which slot to write to
 
     void Moves(MenuEntry *entry) {
-        const vector<string> options = {"Move 1", "Move 2", "Move 3", "Move 4"};
+        const vector<string> options = {
+            getLanguage->Get("KB_BATTLE_MOVE") + " 1",
+            getLanguage->Get("KB_BATTLE_MOVE") + " 2",
+            getLanguage->Get("KB_BATTLE_MOVE") + " 3",
+            getLanguage->Get("KB_BATTLE_MOVE") + " 4"
+        };
+
         Keyboard keyboard;
 
         // Ensure the player is in battle and pointers are valid and not = 0
@@ -384,7 +405,7 @@ namespace CTRPluginFramework {
                     }
 
                     // Notify user of the move change
-                    OSD::Notify("Move " + to_string(moveSlot + 1) + ": " + movesList[move - 1]);
+                    MessageBox(CenterAlign(getLanguage->Get("KB_BATTLE_MOVE") + " " + to_string(moveSlot + 1) + ": " + movesList[move - 1]), DialogType::DialogOk, ClearScreen::Both)();
                     break;
                 }
             }
@@ -400,8 +421,8 @@ namespace CTRPluginFramework {
         if (IfInBattle()) {
             // Prompt user to enter a new multiplier value
             if (KeyboardHandler<u8>::Set(entry->Name() + ":", true, false, 3, multiplier, 0, 1, 100, Callback<u8>)) {
+                MessageBox(CenterAlign(entry->Name() + ": x" + to_string(multiplier)), DialogType::DialogOk, ClearScreen::Both)();
                 entry->SetGameFunc(UpdateExpMultiplier);
-                OSD::Notify("Exp: x" + to_string(multiplier));
             }
         }
     }
@@ -477,7 +498,14 @@ namespace CTRPluginFramework {
         static PK7 *pokemon = new PK7; // Pointer to Pokemon data
         static const u32 address = AutoGameSet(0x3003035C, 0x30030544); // Base address for Pokemon data
         static u32 currentOffset = address; // Current offset in the Pokemon data
-        static const vector<string> statNames = {"HP", "Atk", "Def", "SpD", "SpA", "Spd"}; // Names of stats
+        static const vector<string> statNames = {
+            getLanguage->Get("PK_VIEW_HP"),
+            getLanguage->Get("PK_VIEW_ATK"),
+            getLanguage->Get("PK_VIEW_DEF"),
+            getLanguage->Get("PK_VIEW_SPE"),
+            getLanguage->Get("PK_VIEW_SPA"),
+            getLanguage->Get("PK_VIEW_SPD")
+        };
 
         // Early exit if the current screen is not the top screen
         if (!screen.IsTop)
@@ -514,24 +542,24 @@ namespace CTRPluginFramework {
         if (screenDisplay == 0) {
             const CTRPluginFramework::Screen &screen = CTRPluginFramework::OSD::GetTopScreen();
             u32 slotIndex = (currentOffset - address) / stepSize; // Calculate Pokemon slot index
-            screen.DrawSysfont(headerColor << "[Slot: " << Utils::ToString(slotIndex + 1, 0) << "]", xPos, yPos, textColor);
+            screen.DrawSysfont(headerColor << "[" << getLanguage->Get("PK_VIEW_SLOT") << " " << Utils::ToString(slotIndex + 1, 0) << "]", xPos, yPos, textColor);
             yPos += lineHeight;
-            screen.DrawSysfont("Species: " << Color(0xF2, 0xCE, 0x70) << speciesList[pokemon->species - 1], xPos, yPos, textColor);
+            screen.DrawSysfont(getLanguage->Get("PK_VIEW_SPECIES") << " " << Color(0xF2, 0xCE, 0x70) << speciesList[pokemon->species - 1], xPos, yPos, textColor);
             yPos += lineHeight;
-            screen.DrawSysfont("Nature: " << textColor << natureList[pokemon->nature], xPos, yPos, textColor);
+            screen.DrawSysfont(getLanguage->Get("PK_VIEW_NATURE") << " " << textColor << natureList[pokemon->nature], xPos, yPos, textColor);
             yPos += lineHeight;
-            screen.DrawSysfont("Item: " << (pokemon->heldItem == 0 ? Color::Gray : textColor) << (pokemon->heldItem == 0 ? "None" : heldItemList[pokemon->heldItem - 1]), xPos, yPos, textColor);
+            screen.DrawSysfont(getLanguage->Get("PK_VIEW_ITEM") << " " << (pokemon->heldItem == 0 ? Color::Gray : textColor) << (pokemon->heldItem == 0 ? getLanguage->Get("PK_VIEW_NONE") : heldItemList[pokemon->heldItem - 1]), xPos, yPos, textColor);
             yPos += lineHeight;
-            screen.DrawSysfont("Ability: " << textColor << abilityList[pokemon->ability - 1], xPos, yPos, textColor);
+            screen.DrawSysfont(getLanguage->Get("PK_VIEW_ABILITY") << " " << textColor << abilityList[pokemon->ability - 1], xPos, yPos, textColor);
         }
 
         else if (screenDisplay == 1) {
-            screen.DrawSysfont(headerColor << "[Moves]", xPos, yPos, textColor);
+            screen.DrawSysfont(headerColor << getLanguage->Get("PK_VIEW_MOVES"), xPos, yPos, textColor);
             yPos += lineHeight;
 
             // Loop through and display each move
             for (int i = 0; i < 4; i++) {
-                string moveDisplay = pokemon->move[i] > 0 ? movesList[pokemon->move[i] - 1] : "None";
+                string moveDisplay = pokemon->move[i] > 0 ? movesList[pokemon->move[i] - 1] : getLanguage->Get("PK_VIEW_NONE");
                 screen.DrawSysfont(to_string(i + 1) + ": " << (pokemon->move[i] > 0 ? textColor : Color::Gray) << moveDisplay, xPos, yPos, textColor);
                 yPos += lineHeight;
             }
@@ -539,7 +567,7 @@ namespace CTRPluginFramework {
 
         // Display Pokemon IVs
         else if (screenDisplay == 2) {
-            screen.DrawSysfont(headerColor << "[IV]", xPos, yPos, textColor);
+            screen.DrawSysfont(headerColor << getLanguage->Get("PK_VIEW_IV"), xPos, yPos, textColor);
             yPos += lineHeight;
 
             // Loop through and display each IV value
@@ -552,7 +580,7 @@ namespace CTRPluginFramework {
 
         // Display Pokemon EVs
         else if (screenDisplay == 3) {
-            screen.DrawSysfont(headerColor << "[EV]", xPos, yPos, textColor);
+            screen.DrawSysfont(headerColor << getLanguage->Get("PK_VIEW_EV"), xPos, yPos, textColor);
             yPos += lineHeight;
 
             // Loop through and display each EV value
@@ -581,7 +609,7 @@ namespace CTRPluginFramework {
     }
 
     void ViewPokemonInfo(MenuEntry *entry) {
-        static const vector<string> options = {"Enable", "Disable"}; // Options for toggling Pokemon info view
+        static const vector<string> options = {getLanguage->Get("PK_VIEW_ENABLE"), getLanguage->Get("PK_VIEW_DISABLE")}; // Options for toggling Pokemon info view
         Keyboard keyboard;
 
         // Check if currently in battle
@@ -589,9 +617,8 @@ namespace CTRPluginFramework {
             if (keyboard.Setup(entry->Name() + ":", false, options, infoViewState) != -1) {
                 // Update the flag to enable or disable Pokemon info view based on selection
                 isInfoViewOn = (infoViewState == 0);
-                // Set the function to toggle Pokemon info
+                MessageBox(CenterAlign(getLanguage->Get("PK_VIEW_INFO") + " " + string(options[infoViewState])), DialogType::DialogOk, ClearScreen::Both)();
                 entry->SetGameFunc(TogglePokemonInfo);
-                OSD::Notify("Info view: " + string(options[infoViewState]));
             }
         }
     }
@@ -763,10 +790,10 @@ namespace CTRPluginFramework {
             // Set up and handle form selection for the Pokemon
             if (keyboard.Setup("Form:", true, formList(pokemon), form) != -1) {
                 // Set up and handle level input for the Pokemon
-                if (KeyboardHandler<u8>::Set("Level:", true, false, 3, level, 0, 1, 100, Callback<u8>)) {
+                if (!KeyboardHandler<u8>::Set(getLanguage->Get("KB_SPAWNER_LEVEL"), true, false, 3, level, 0, 1, 100, Callback<u8>)) {
                     // Assign the function to update wild spawner configuration
+                    MessageBox(CenterAlign(getLanguage->Get("SPAWNER_SPAWNING") + " " + string(speciesList[pokemon - 1]) + " (" + getLanguage->Get("KB_SPAWNER_FORM") + " " + to_string(form + 1) + ", " + getLanguage->Get("KB_SPAWNER_LEVEL") + " " + to_string(level) + ")"), DialogType::DialogOk, ClearScreen::Both)();
                     entry->SetGameFunc(UpdateWildSpawner);
-                    OSD::Notify("Spawning: " + string(speciesList[pokemon - 1]));
                 }
             }
         }
@@ -922,20 +949,20 @@ namespace CTRPluginFramework {
         u32 data32;
 
         if (!Process::Read32(address, data32)) { // Check if reading data fails
-            OSD::Notify("Failed to read data from address"); // Notify user if reading data fails
+            MessageBox(CenterAlign(getLanguage->Get("PLUGIN_HOME_MENU")), DialogType::DialogOk, ClearScreen::Both)();
             return; // Exit function early
         }
 
         // Check if the lower bits are already set to 0x3FF80
         if ((data32 & ~0xFFF00000) == 0x3FF80) {
-            OSD::Notify("Already unlocked all mounts"); // Notify user that mounts are already unlocked
+            MessageBox(CenterAlign(getLanguage->Get("PLUGIN_ALREADY_DONE")), DialogType::DialogOk, ClearScreen::Both)();
             return; // Exit function early
         }
 
         // Keep the top 12 bits and set the lower bits to 0x3FF80
         data32 = (data32 & 0xFFF00000) + 0x3FF80;
         Process::Write32(address, data32); // Write the modified value back to the address
-        OSD::Notify("All mounts unlocked!"); // Notify user that all mounts are unlocked
+        MessageBox(CenterAlign(getLanguage->Get("PLUGIN_SUCCESS")), DialogType::DialogOk, ClearScreen::Both)();
     }
 
     void ZoomedOutView(MenuEntry *entry) {
@@ -950,7 +977,7 @@ namespace CTRPluginFramework {
 
             // Notify user about key bindings only once
             if (!notified) {
-                OSD::Notify("Zoom: L to zoom out, R to reset to default");
+                MessageBox(CenterAlign("L & R"), DialogType::DialogOk, ClearScreen::Both)();
                 notified = true; // Set the flag to true after notifying
             }
         }
@@ -1004,7 +1031,7 @@ namespace CTRPluginFramework {
             initialized = true;
         }
 
-        if (entry->IsActivated()) {
+        if (entry->IsActivated() && entry->Hotkeys[0].IsDown()) {
             bool success = true;
             size_t index = 0;
 
@@ -1028,7 +1055,7 @@ namespace CTRPluginFramework {
         }
 
         // When deactivated, restore the original values
-        else if (!entry->IsActivated()) {
+        else {
             for (auto &manager : managers) {
                 if (manager.HasOriginalValue())
                     manager.~MemoryManager(); // Explicitly call the destructor to restore the original value
@@ -1042,9 +1069,9 @@ namespace CTRPluginFramework {
     static u8 time; // Store time in-game
 
     void SetSunMoon(MenuEntry *entry) {
-        if (KeyboardHandler<u8>::Set("Time:\n\nTime must be within range of 1-24 hours\n\n" << Color::SkyBlue << "12H" << Color::White << ": Moon\n\n" << Color::Orange << "24H" << Color::White << ": Sun\n", true, false, 2, time, 0, 1, 24, Callback<u8>)) {
+        if (KeyboardHandler<u8>::Set(entry->Name() << ":" << Color::SkyBlue << "\n\n12H" << Color::White << ": Moon\n\n" << Color::Orange << "24H" << Color::White << ": Sun\n", true, false, 2, time, 0, 1, 24, Callback<u8>)) {
             Process::Write32(AutoGameSet(0x330D9238, 0x330154B0), time * 3600); // Write the time in seconds to the address
-            OSD::Notify("Updated in-game time by " + to_string(time) + " hours"); // Notify user of the update
+            MessageBox(CenterAlign(getLanguage->Get("PLUGIN_SUCCESS")), DialogType::DialogOk, ClearScreen::Both)();
         }
     }
 
