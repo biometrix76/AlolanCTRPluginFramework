@@ -31,3 +31,9 @@ Thanks to the following projects, teams, and individuals for being great resourc
 - [AnalogMan151](https://github.com/AnalogMan151) for the ultraSuMoFramework foundation of the plugin
 - [dragongyre173](https://github.com/dragonfyre173) for the data viewer overlay in-game
 - [JourneyOver](https://github.com/JourneyOver) et al. for providing an extensive ActionReplay code [database](https://github.com/JourneyOver/CTRPF-AR-CHEAT-CODES)
+
+## Live caught status in the Game Guide
+
+Ultra Sun guide pictures can show live caught checkboxes and area totals. See
+[the guide format, metadata writer, and build compatibility notes](docs/live-caught-guide.md)
+for setup and authoring instructions.

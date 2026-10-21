@@ -1,0 +1,13 @@
+[
+  {
+    "path": "00 Reader status.bmp",
+    "rows": [],
+    "area_species": [],
+    "diagnostic": true
+  },
+  {
+    "path": "Example Area/00 Encounters.bmp",
+    "rows": [19, 51, 88],
+    "area_species": [19, 51, 88, 172]
+  }
+]

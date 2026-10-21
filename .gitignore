@@ -7,3 +7,7 @@
 /luma
 /luma.zip
 \.vscode
+*.elf
+__pycache__/
+CaughtTracker.log
+CaughtTracker-memory.bin

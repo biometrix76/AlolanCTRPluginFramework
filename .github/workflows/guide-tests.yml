@@ -1,0 +1,16 @@
+name: Guide regression tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  native-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run C++11 guide tests with sanitizers
+        run: python3 tests/run_tests.py --sanitizers on

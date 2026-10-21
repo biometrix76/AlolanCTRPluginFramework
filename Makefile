@@ -67,7 +67,7 @@ all: $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(TOPDIR)/Makefile
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(TOPDIR)/Makefile $(BUILD_TARGET)
 	@rm -rf $(BUILD)
 
 #---------------------------------------------------------------------------------
@@ -89,6 +89,7 @@ DEPENDS := $(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 
 $(OUTPUT).3gx : $(OFILES)
+$(OUTPUT).elf : $(OFILES)
 
 #---------------------------------------------------------------------------------
 # You need a rule like this for each extension you use as binary data
